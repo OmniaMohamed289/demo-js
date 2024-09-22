@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Management</title>
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script>
+        var products = JSON.parse(localStorage.getItem("products")) || [];
+
+        function displayCartona() {
+            var cartona = '';
+            for (var i = 0; i < products.length; i++) {
+                cartona += `
+                <tr>
+                    <td>${products[i].name}</td>
+                    <td>${products[i].price}</td>
+                    <td>${products[i].desc}</td>
+                    <td>
+                        <button onclick="deleteProduct(${i})" class="btn btn-danger">Delete</button>
+                        <button onclick="updateProduct(${i})" class="btn btn-warning">Update</button>
+                    </td>
+                </tr>`;
+            }
+            document.getElementById("demo").innerHTML = cartona;
+        }
+
+        function getProduct() {
+            var name = document.getElementById("prodName").value;
+            var price = document.getElementById("prodprice").value;
+            var desc = document.getElementById("proddes").value;
+
+            if (name && price && desc) {
+                var product = { name: name, price: price, desc: desc };
+                products.push(product);
+                localStorage.setItem("products", JSON.stringify(products));
+                displayCartona();
+                clearInputs();
+            } else {
+                alert("Please fill in all fields.");
+            }
+        }
+
+        function deleteProduct(index) {
+            products.splice(index, 1);
+            localStorage.setItem("products", JSON.stringify(products));
+            displayCartona();
+        }
+
+        function updateProduct(index) {
+            var name = prompt("Enter new product name:", products[index].name);
+            var price = prompt("Enter new product price:", products[index].price);
+            var desc = prompt("Enter new product description:", products[index].desc);
+
+            if (name && price && desc) {
+                products[index] = { name: name, price: price, desc: desc };
+                localStorage.setItem("products", JSON.stringify(products));
+                displayCartona();
+            } else {
+                alert("Please fill in all fields.");
+            }
+        }
+
+        function clearInputs() {
+            document.getElementById("prodName").value = "";
+            document.getElementById("prodprice").value = "";
+            document.getElementById("proddes").value = "";
+        }
+
+        function search(search) {
+            var cartona2 = '';
+            for (var i = 0; i < products.length; i++) {
+                if (products[i].name.toLowerCase().includes(search.toLowerCase())) {
+                    cartona2 += `
+                    <tr>
+                        <td>${products[i].name.replace(search, `<span>${search}</span>`)}</td>
+                        <td>${products[i].price}</td>
+                        <td>${products[i].desc}</td>
+                        <td>
+                            <button onclick="deleteProduct(${i})" class="btn btn-danger">Delete</button>
+                            <button onclick="updateProduct(${i})" class="btn btn-warning">Update</button>
+                        </td>
+                    </tr>`;
+                }
+            }
+            document.getElementById("demo").innerHTML = cartona2;
+        }
+
+        window.onload = function() {
+            displayCartona();
+        };
+    </script>
+</head>
+<body>
+    <div class="container my-3">
+        <input type="text" class="form-control" id="prodName" placeholder="Product Name">
+        <input type="text" class="form-control my-3" id="prodprice" placeholder="Product Price">
+        <textarea class="form-control my-3" id="proddes" cols="20" rows="5" placeholder="Description"></textarea>
+        <button onclick="getProduct()" class="form-control btn btn-danger">Add Product</button>
+    </div>
+
+    <input type="text" onkeyup="search(this.value)" class="form-control my-3 m-auto w-50" id="search" placeholder="Search...">
+
+    <div class="container">
+        <table class="table table-hover">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Price</th>
+                    <th>Description</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody id="demo">
+                <!-- Products will be displayed here -->
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>
